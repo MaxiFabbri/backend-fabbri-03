@@ -1,0 +1,63 @@
+<style>
+    .newproduct-container {
+        margin-top: 64px !important;
+        max-width: 700px;
+        margin: auto;
+        padding: 32px;
+        border-radius: 0.5em;
+        color: #fff;
+        border: 1px solid #666;
+    }
+
+    .a2 {
+        color: #e1e1e1;
+    }
+
+    .a2:hover {
+        color: #fff;
+    }
+</style>
+
+<nav style="display: flex; justify-content: space-between ">
+    <div style="font-size: 25px">Logo</div>
+    <h2>Nuevo Producto</h2>
+    <a style="text-decoration: none; font-size: 22px" href="/views/products">productos</a>
+</nav>
+
+<div class="newproduct-container">
+    <h1><b>Merchan Store</b></h1>
+    <div class="product-input">
+        <h4>Cargar Producto</h4>
+
+        
+        <form action="/api/products/files" method="post" enctype="multipart/form-data">
+            <div class="input-element">
+                <input type="text" name="title" class="form-control" placeholder="Title" required="required" autofocus="autofocus">
+            </div>
+            <div class="input-element">
+                <input type="text" name="description" class="form-control" placeholder="Description" required="required">
+            </div>
+            <div class="input-element">
+                <input type="text" name="code" class="form-control" placeholder="Code" required="required">
+            </div>
+            <div class="input-element">
+                <input type="number" name="price" class="form-control" placeholder="Price" required="required">
+            </div>
+            <div class="input-element">
+                <input type="number" name="stock" class="form-control" placeholder="Stock" required="required">
+            </div>
+            <div class="input-element">
+                <input type="text" name="category" class="form-control" placeholder="Category" required="required">
+            </div>
+            <div class="input-element">
+                <label for="status"> Status</label>
+                <input type="checkbox">
+            </div>
+            <div class="input-element">
+                <input type="file" name="thumbnails" class="form-control" multiple>
+            </div>
+
+            <button type="submit" class="btn btn-success">Cargar</button>
+        </form>
+    </div>
+</div>

@@ -1,33 +1,120 @@
-<div>
+{{!-- Hago un pequeño Navbar para navegar a otras páginas --}}
+<nav style="display: flex; justify-content: space-between ">
+    <div style="font-size: 25px">Logo</div>
     <h2>Productos</h2>
-</div>
+    <a style="text-decoration: none; font-size: 22px" href="/views/newproduct">Cargar Producto</a>
+</nav>
+
+{{!-- Hago la lista de productos --}}
 <div id="productsList" class="products-container" >
+    {{!-- Itero cada producto en una Card --}}
+    {{#each products.docs}}
+        <div class="product-card" id="{{this._id}}">
+            <h4>{{this.title}}</h4>
+            <h6>Categoría {{this.category}}</h6>
+            <h6>Descripción {{this.description}}</h6>
+            <h6>Precio $ {{this.price}}</h6>
+            <button class="btn btn-success add-to-cart" data-id="{{this._id}}" data-title="{{this.title}}">Agregar al Carrito</button>
+        </div>
+    {{/each}}
+</div>
+{{!-- Pngo los link de Paginacion --}}
+<div style="display: flex; justify-content: space-between ">
+    {{#if products.hasPrevPage}}
+        <a href="./?limit={{products.limit}}&page={{products.prevPage}}">
+            <h6>Página previa {{products.prevPage}}</h6>
+        </a>
+    {{else}}
+        <h6></h6>
+    {{/if}}
+    <h5>Pagina: {{products.page}} de {{products.totalPages}}</h5>
+    {{#if products.hasNextPage}}
+        <a href="./?limit={{products.limit}}&page={{products.nextPage}}">
+            <h6>Próxima página {{products.nextPage}}</h6>
+        </a>
+    {{else}}
+        <h6></h6>
+    {{/if}}
     
 </div>
 
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.1/dist/sweetalert2.all.min.js"></script>
-<script type="module">
+<script>
+    //Funcion para crear un nuevo Cart
+    const createCart = async () => {
+        try {
+            const response = await fetch('../api/carts', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+            });
 
-    import {renderProducts} from '/static/js/public-utils.js';
-
-    const productsList = document.getElementById('productsList');
-    const getProducts = async() => { fetch('/api/products/', { method: 'GET'})
-        .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            return response.json();
-        })
-        .then(data => {
-            //console.log('Data Recibida dentro de getProducts: ',data);
-            renderProducts(data.data);
-        })
-        .catch(error => {
+            const data = await response.json();
+            return data
+        } catch (error) {
             console.error('Hubo un problema con tu fetch operación:', error);
-        })
+        }
     }
-    getProducts()
+
+    //Verifico si tengo un Cart ID en LocalStorage
+    const cart = JSON.parse(localStorage.getItem('cart'))
+    var cartId = cart ? cart : ""
+
+    //En caso de no tener un Cart en localstorage, creo uno y lo guardo
+    if(cartId == "") {
+        (async () => {
+            const data = await createCart();
+            cartId = data.data._id
+            const cartIdSting = JSON.stringify(cartId)
+            localStorage.setItem('cart', cartIdSting)
+            console.log("Cart Created: ", data.data._id);
+        })();
+    }
+    
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.add-to-cart');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                const productTitle = this.getAttribute('data-title');
+                
+                // Aquí puedes agregar la lógica para agregar el producto al carrito
+                addToCart(productId, cartId);
+                
+                // Muestra una alerta con SweetAlert2
+                Swal.fire({
+                    title: 'Producto Agregado!',
+                    text: `${productTitle} ha sido agregado al carrito.`,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        });
+    });
+    
+    
+    async function addToCart(productId, cid) {
+        try {
+            const response = await fetch(`../api/carts/${cartId}/product/${productId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            const data = await response.json();
+            return data
+        } catch (error) {
+            console.error('Hubo un problema con tu fetch operación:', error);
+        }
+        console.log(`Producto ${productId} agregado al carrito: ${cid}`);
+    }
 
 </script>

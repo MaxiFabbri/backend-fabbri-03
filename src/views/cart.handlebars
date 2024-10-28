@@ -1,0 +1,29 @@
+{{!-- Hago un pequeño Navbar para navegar a otras páginas --}}
+<nav style="display: flex; justify-content: space-between ">
+    <div style="font-size: 25px">Logo</div>
+    <h2>CARRO DE COMPRAS</h2>
+    <a style="text-decoration: none; font-size: 22px" href="/views/products">Productos</a>
+</nav>
+
+{{!-- Hago la lista de productos // MODIFICARLO PARA VER EL CART--}}
+<div id="productsList" class="products-container" >
+    {{!-- Itero cada producto en una Card --}}
+    {{#each products}}
+        <div class="product-card" id="{{this._id}}">
+            <h4>{{this._id.title}}</h4>
+            <h6>Descripción {{this._id.description}}</h6>
+            <h6>Codigo: {{this._id.code}}</h6>
+            <h6>Categoría {{this._id.category}}</h6>
+            
+            <h6>Precio $ {{this._id.price}}</h6>
+            <h6>Stock: {{this._id.stock}}</h6>
+            <h5>Cantidad: {{this.qty}}</h5>
+            
+        </div>
+    {{/each}}
+</div>
+
+
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.1/dist/sweetalert2.all.min.js"></script>

@@ -1,25 +1,3 @@
-import fs from 'fs';
-import config from './config.js';
-
-export const readFile = (fileName) => {
-    const fileContent = fs.readFileSync(fileName, 'utf-8');
-    return JSON.parse(fileContent);  
-}
-
-// Nueva version de read File con promesas
-export const readFileAsync = async (filename) => {
-    const fileContent = fs.promises.readFile(filename, 'utf-8')
-    return await JSON.parse(fileContent)
-}
-
-export const writeFile = async (fileName, content) => {
-    try {
-        await fs.promises.writeFile(fileName, JSON.stringify(content)); 
-    } catch (err) {
-        console.log(err)
-    } 
-}
-
 
 export const renderProducts = products =>{
     products.forEach(product => {
@@ -43,7 +21,3 @@ export const renderProducts = products =>{
         productsList.appendChild(productCard);
     })  
 }
-
-// writeFile("./products.json", productos)
-
-// const productos2 = await readFile("./products.json")

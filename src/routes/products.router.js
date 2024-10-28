@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import {writeFile, readFile} from '../utils.js';
-import config from '../config.js';
-import productModel from '../dao/models/product.model.js';
+import { uploader } from '../uploader.js';
+
+import ProductController from '../dao/products.controller.js';
 
 const router = Router();
-const PRODFILE = './src/files/products.json';
+const controller = new ProductController
 
 // Leo los arrays desde archivo mientras lo declaro
-const products =  readFile(PRODFILE);
+//const products =  readFile(PRODFILE);
 
 // funciones
 const validateString = value =>{
@@ -32,6 +32,7 @@ const validateBoolean = value =>{
 // Middlewares a utilizar
 // chequeo que los productos que se carguen tengan todas las propiedades requeridas y que sean del tipo correcto
 const checkProduct = (req,res,next) =>{
+    console.log(" body: ",req.body)
     if (!req.body.hasOwnProperty('title') || !validateString(req.body.title || req.body.title == "")) {
         return res.status(404).send({ error: 'Error, title is missing or is not a String', data: [] });
     } else if (!req.body.hasOwnProperty('description') || !validateString(req.body.description || req.body.description == "")) {
@@ -49,13 +50,7 @@ const checkProduct = (req,res,next) =>{
     };
     next();   
 };
-// chequeo que el body en los PUT, no contenga id, y si lo contiene, lo borro
-const checkId = (req,res,next) =>{
-    if (req.body.hasOwnProperty('id')){
-        delete req.body.id;
-    };
-    next();
-};
+
 // chequeo en los PUT que la propiedad status este correcta y sino la pongo en false
 const checkStatus = (req, res, next) =>{
     if (!req.body.hasOwnProperty('status') || !validateBoolean(req.body.status)) {
@@ -63,35 +58,10 @@ const checkStatus = (req, res, next) =>{
     };
     next();
 };
-// Leo el archivo products.json y lo traigo al array products
-const updateProducts = (req, res, next) =>{
-    const products = readFile(PRODFILE)
-    next();
-};
 
-
-
-// Endpoint GET sin parametros o con un Query
-//router.get('/', updateProducts, async (req, res) => { 
-router.get('/', async (req, res) => { 
-    const limitNumber = req.query.limit;
-    const data = await productModel.find().limit(limitNumber).lean()
-    res.status(200).send({ error: null, data: data })
-});
-
-// Endpoint GET con params
-router.get('/:id', async (req, res) => {
-    const { id }  = req.params;
-    const process = await productModel.findById(id).lean()
-    if(process) {
-        res.status(200).send({ error: null, data: process });
-    } else {
-        res.status(404).send({ error: 'Dato invalido', data: "" });
-    }
-});
-// Endpoint POST
+// Endpoint POST sin archivos para usar con Postman
 router.post('/', checkProduct, async (req, res) => {
-    const {title, description, code, price, status, stock, category} = req.body
+    const {title, description, code, price, status, stock, category, thumbnails} = req.body 
     const newProduct = { 
         title, 
         description,
@@ -99,9 +69,10 @@ router.post('/', checkProduct, async (req, res) => {
         price,
         status: status || true,
         stock,
-        category
+        category,
+        thumbnails
     };
-    const process = await productModel.create(newProduct)
+    const process = await controller.add(newProduct)
 
     // Recuperamos la instancia global de socketServer para poder realizar un emit
     const socketServer = req.app.get('socketServer');
@@ -109,6 +80,26 @@ router.post('/', checkProduct, async (req, res) => {
 
     res.status(200).send({ error: null, data: process });
 });
+//Endpoint para recibir archivos desde Hanndlebars
+router.post('/files', uploader.array('thumbnails', 3), async (req, res) => { // gestión de múltiples archivos viene en = req.files
+        console.log("body: ",req.body)
+        const {title, description, code, price, status, stock, category} = req.body
+        const files = req.files
+        const thumbnails = files.map(thumbnail => thumbnail.originalname);   
+        const newProduct = { 
+            title, 
+            description,
+            code,
+            price,
+            status: status || true,
+            stock,
+            category,
+            thumbnails
+        };
+        const process = await controller.add(newProduct)    
+        res.status(200).send({ error: null, data: process });
+    });
+
 //  Endpoint PUT con param
 router.put('/:id', checkProduct, checkStatus, async (req, res) => {
     const { id }  = req.params;
@@ -116,7 +107,7 @@ router.put('/:id', checkProduct, checkStatus, async (req, res) => {
     const filter = {_id: id}
     const updated = {title: title, description: description, code: code, price: price, status, stock, category}
     const options = {new: true}
-    const process = await productModel.findByIdAndUpdate(filter, updated, options)
+    const process = await controller.update(filter, updated, options);
 
     if (process) {
         res.status(200).send({ error: null, data: process });
@@ -129,9 +120,7 @@ router.delete('/:id', async (req, res) => {
     const { id }  = req.params;
     const filter = {_id: id}
 
-    const process = await productModel.findOneAndDelete(filter)
-
-    
+    const process = await controller.update(filter);
     if (process) {
 
         // Recuperamos la instancia global de socketServer para poder realizar un emit
