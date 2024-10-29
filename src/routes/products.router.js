@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { uploader } from '../uploader.js';
-
 import ProductController from '../dao/products.controller.js';
 
 const router = Router();
 const controller = new ProductController
 
-// Leo los arrays desde archivo mientras lo declaro
-//const products =  readFile(PRODFILE);
 
 // funciones
 const validateString = value =>{
@@ -80,25 +77,25 @@ router.post('/', checkProduct, async (req, res) => {
 
     res.status(200).send({ error: null, data: process });
 });
+
 //Endpoint para recibir archivos desde Hanndlebars
-router.post('/files', uploader.array('thumbnails', 3), async (req, res) => { // gestión de múltiples archivos viene en = req.files
-        console.log("body: ",req.body)
-        const {title, description, code, price, status, stock, category} = req.body
-        const files = req.files
-        const thumbnails = files.map(thumbnail => thumbnail.originalname);   
-        const newProduct = { 
-            title, 
-            description,
-            code,
-            price,
-            status: status || true,
-            stock,
-            category,
-            thumbnails
-        };
-        const process = await controller.add(newProduct)    
-        res.status(200).send({ error: null, data: process });
-    });
+router.post('/files', uploader.array('thumbnails', 3), async (req, res) => {
+    const {title, description, code, price, status, stock, category} = req.body
+    const files = req.files
+    const thumbnails = files.map(thumbnail => thumbnail.originalname);   
+    const newProduct = { 
+        title, 
+        description,
+        code,
+        price,
+        status: status || false,
+        stock,
+        category,
+        thumbnails
+    };
+    const process = await controller.add(newProduct)  
+    res.status(200).send({ error: null, data: process });
+});
 
 //  Endpoint PUT con param
 router.put('/:id', checkProduct, checkStatus, async (req, res) => {
@@ -115,6 +112,7 @@ router.put('/:id', checkProduct, checkStatus, async (req, res) => {
         res.status(404).send({ error: 'No se encuentra el producto', data: [] });
     }
 });
+
 // Endpoint DELETE con param
 router.delete('/:id', async (req, res) => {
     const { id }  = req.params;

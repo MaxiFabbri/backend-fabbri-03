@@ -60,11 +60,11 @@
         }
     }
 
-    //Verifico si tengo un Cart ID en LocalStorage
+    //Verifico si tengo un Cart ID en LocalStorage y si lo tengo, lo traigo
     const cart = JSON.parse(localStorage.getItem('cart'))
     var cartId = cart ? cart : ""
 
-    //En caso de no tener un Cart en localstorage, creo uno y lo guardo
+    //En caso de NO tener un Cart en localstorage, creo uno y lo guardo
     if(cartId == "") {
         (async () => {
             const data = await createCart();
@@ -75,7 +75,7 @@
         })();
     }
     
-
+    //Escucho los botones Add to Cart y si los presionan, cargo el producto al carro y muestro un Alert
     document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.add-to-cart');
         
@@ -98,7 +98,7 @@
         });
     });
     
-    
+   //Funcion para agregar productos al cart (de a 1, no manejo cantidad aun) 
     async function addToCart(productId, cid) {
         try {
             const response = await fetch(`../api/carts/${cartId}/product/${productId}`, {

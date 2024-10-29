@@ -1,5 +1,4 @@
 import { Router } from 'express';
-// import { users } from '../config.js';
 import ProductController from '../dao/products.controller.js';
 import CartController from '../dao/carts.controller.js'
 const controller = new ProductController
@@ -7,6 +6,7 @@ const cartController = new CartController
 
 const router = Router();
 
+// Ruta que renderiza la pagina products, dependiendo de lo solicitado por params o query
 router.get('/products/:id?', async (req, res) => {
     const { id }  = req.params;
     var filter = {}
@@ -37,17 +37,13 @@ router.get('/products/:id?', async (req, res) => {
     }
 });
 
-router.get('/realtimeproducts', async (req, res) => {
-    const data = {};
-    res.status(200).render('realTimeProducts', data);
-});
-
+// Ruta que renderiza la página para cargar un nuevo producto
 router.get('/newproduct', async (req, res) => {
     const data = {};
     res.status(200).render('newproduct', data);
 });
 
-
+// Ruta que renderiza la pagina del carro de compras
 router.get('/cart/:cid', async (req, res) => {
     const { cid }  = req.params;
     const filter = {_id: cid}

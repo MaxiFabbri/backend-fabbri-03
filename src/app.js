@@ -10,9 +10,6 @@ import config from './config.js';
 
 const app = express();
 
-
-
-
 const httpServer = app.listen(config.PORT, async () => {
     await mongoose.connect(config.MONGODB_URI)
     

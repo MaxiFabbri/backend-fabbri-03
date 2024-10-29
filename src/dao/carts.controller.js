@@ -12,7 +12,7 @@ class CartController {
         }
     }
 
-    // Endpoint para crear un Carrito Vacío
+    // Metodo para crear un Carrito Vacío
     add = async () => { 
         try {
             return await cartModel.create({product: []});
@@ -21,7 +21,7 @@ class CartController {
         }
     }
 
-    // Endpoint para actualizar la cantidad de 1 producto
+    // Metodo para actualizar la cantidad de 1 producto
     updateOne = async (cartId, prodId, newQty) => {
         try {
             const cart = await cartModel.findById(cartId); // Encuentra el carrito por ID
@@ -49,7 +49,7 @@ class CartController {
         }
     }
 
-    // Endpoint para actualizar TODOS los productos del carro
+    // Metodo para actualizar TODOS los productos del carro
     updateAll = async (filter, updated, options) => {
         try {
             return await cartModel.findOneAndUpdate(filter, updated, options )   
@@ -58,14 +58,14 @@ class CartController {
         }
     }
 
-    // Endpoint para agregar productos al carrito o modificar la cantidad
+    // Metodo para agregar productos al carrito o modificar la cantidad
+    // Estos metodos tienen mas logica en los mismos de la que me hubiera gustado, pero no encontré otra forma de modificar el Array interior
     updateProd = async (cartId, newProductId) => {
         try {
             const cart = await cartModel.findById(cartId); // Encuentra el carrito por ID
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
             // Encuentra el producto en el carrito
             const productIndex = cart.product.findIndex(prod => prod._id == newProductId);
 
@@ -86,7 +86,7 @@ class CartController {
         }
     };
     
-    // Permite borrar UN producto del carro
+    // Metodo para borrar UN producto del carro
     deleteProd = async (cartId, productId) => {
         try {
             const cart = await cartModel.findById(cartId); // Encuentra el carrito por ID

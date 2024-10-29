@@ -1,6 +1,5 @@
 import * as url from 'url';
 
-
 const config = {
     PORT: 5050,
     DIRNAME: url.fileURLToPath(new URL('.', import.meta.url)),
@@ -13,12 +12,5 @@ const config = {
     PRODUCTS_COLLECTION: 'products'
 
 };
-
-// export const users = [
-//     { id: 1, firstName: 'Juan', lastName: 'Perez' },
-//     { id: 2, firstName: 'Carlos', lastName: 'Perren' },
-//     { id: 3, firstName: 'Luis', lastName: 'Gonzalez' }
-// ];
-
 
 export default config;

@@ -29,7 +29,7 @@
     <div class="product-input">
         <h4>Cargar Producto</h4>
 
-        
+        {{!-- Formulario para cargar producto, permite cargar 1 o más imagenes y almacena los nombres en thumbnails --}}
         <form action="/api/products/files" method="post" enctype="multipart/form-data">
             <div class="input-element">
                 <input type="text" name="title" class="form-control" placeholder="Title" required="required" autofocus="autofocus">
@@ -50,8 +50,8 @@
                 <input type="text" name="category" class="form-control" placeholder="Category" required="required">
             </div>
             <div class="input-element">
-                <label for="status"> Status</label>
-                <input type="checkbox">
+                <label> Status</label>
+                <input name="status" type="checkbox" value=true>
             </div>
             <div class="input-element">
                 <input type="file" name="thumbnails" class="form-control" multiple>
@@ -61,3 +61,5 @@
         </form>
     </div>
 </div>
+<script>
+</script>
